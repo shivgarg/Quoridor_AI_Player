@@ -40,7 +40,7 @@ public:
 	int **walls;
 	int move[3];
 	void implement_move(int type,int x,int y);
-	void set_move();
+	vector<Position> get_move(int x,int y);
 
 	Board(int x,int y, int z)
 	{
@@ -86,13 +86,13 @@ public:
 	}
 	bool east(int x,int y)
 	{
-		if (walls[y][x+1]==1 || walls[y+1][x+1]==1)
+		if (walls[y][x+1]==2 || walls[y+1][x+1]==2)
 				return false;
 			else true;
 	}
 	bool west(int x,int y)
 	{
-		if (walls[y][x]==1 || walls[y+1][x]==1)
+		if (walls[y][x]==2 || walls[y+1][x]==2)
 				return false;
 			else true;
 	}
