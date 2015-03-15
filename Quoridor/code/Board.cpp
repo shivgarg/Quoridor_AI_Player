@@ -15,6 +15,12 @@ void Board::implement_move(int type,int x,int y)
 	}
 }
 
+
+void Board::set_move()
+{
+
+}
+
 vector<Position> Board::get_move(int x,int y)
 {
 		vector<Position> lis;
@@ -100,10 +106,10 @@ vector<Position> Board::get_move(int x,int y)
 									if(west(x,y+1))
 										lis.push_back(Position(x-1,y+1));
 								}
-								if(onboard(x+1,y-1))
+								if(onboard(x+1,y+1))
 								{
 									if(east(x,y+1))
-										lis.push_back(Position(x+1,y-1));
+										lis.push_back(Position(x+1,y+1));
 								}
 							}
 						}
@@ -146,7 +152,3 @@ vector<Position> Board::get_move(int x,int y)
 		return lis;
 }
 
-int main()
-{
-
-}

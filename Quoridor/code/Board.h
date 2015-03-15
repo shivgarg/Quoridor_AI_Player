@@ -41,6 +41,7 @@ public:
 	int move[3];
 	void implement_move(int type,int x,int y);
 	vector<Position> get_move(int x,int y);
+	void set_move();
 
 	Board(int x,int y, int z)
 	{
@@ -76,25 +77,29 @@ public:
 	{
 			if (walls[y+1][x]==1 || walls[y+1][x+1]==1)
 				return false;
-			else true;
+			else 
+				return true;
 	}
 	bool north(int x,int y)
 	{
 		if (walls[y][x]==1 || walls[y][x+1]==1)
 				return false;
-			else true;
+			else 
+				return true;
 	}
 	bool east(int x,int y)
 	{
 		if (walls[y][x+1]==2 || walls[y+1][x+1]==2)
 				return false;
-			else true;
+			else 
+				return true;
 	}
 	bool west(int x,int y)
 	{
 		if (walls[y][x]==2 || walls[y+1][x]==2)
 				return false;
-			else true;
+			else 
+				return true;
 	}
 		
 
@@ -104,7 +109,7 @@ public:
 
 bool isNotPath(int x1,int y1,int tar)
 {
-			bool visited[n+1][m+1];
+			bool visited[m+1][n+1];
 			memset(visited,false,sizeof(bool)*(m+1)*(n+1));
 			visited[x1][y1]=true;
 			queue< pair<int,int> > bfs_q;
@@ -114,11 +119,7 @@ bool isNotPath(int x1,int y1,int tar)
 			{
 				int x=bfs_q.front().first;
 				int y=bfs_q.front().second;
-				if(y==tar)
-				{
-					isblock=false;
-					break;
-				}
+				
 				bfs_q.pop();
 				if(onboard(x+1,y) && !visited[x+1][y])
 				{
@@ -126,6 +127,12 @@ bool isNotPath(int x1,int y1,int tar)
 						{
 							bfs_q.push(make_pair(x+1,y));
 							visited[x+1][y]=true;
+							if(y==tar)
+							{
+								isblock=false;
+								break;
+							}
+
 						}
 				}
 				if(onboard(x-1,y) && !visited[x-1][y])
@@ -134,6 +141,11 @@ bool isNotPath(int x1,int y1,int tar)
 						{
 							bfs_q.push(make_pair(x-1,y));
 							visited[x-1][y]=true;
+							if(y==tar)
+							{
+								isblock=false;
+								break;
+							}
 						}
 				}
 				if(onboard(x,y+1) && !visited[x][y+1])
@@ -142,6 +154,11 @@ bool isNotPath(int x1,int y1,int tar)
 					{
 						bfs_q.push(make_pair(x,y+1));
 						visited[x][y+1]=true;
+						if(y+1==tar)
+						{
+							isblock=false;
+							break;
+						}
 
 					}
 				}
@@ -151,6 +168,11 @@ bool isNotPath(int x1,int y1,int tar)
 					{
 						bfs_q.push(make_pair(x,y-1));
 						visited[x][y-1]=true;
+						if(y-1==tar)
+						{
+							isblock=false;
+							break;
+						}
 					}
 				}
 

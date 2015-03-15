@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <arpa/inet.h> 
 #include <bits/stdc++.h>
-#include "code/Board.h"
+#include "Board.h"
 
 using namespace std;
 /* Complete the function below to print 1 integer which will be your next move 
@@ -69,6 +69,22 @@ int main(int argc, char *argv[])
     cout<<"Player "<<player<<endl;
     cout<<"Time "<<time_left<<endl;
     cout<<"Board size "<<N<<"x"<<M<<" :"<<K<<endl;
+    Board b(N,M,K);
+    if(player==1)
+    {
+        b.my=&b.p1;
+        b.my_target=N;
+        b.oppo=&b.p2;
+        b.oppo_target=1;
+    }
+    else
+    {
+        b.my=&b.p2;
+        b.my_target=1;
+        b.oppo=&b.p1;
+        b.oppo_target=N;
+
+    }
     float TL;
     int om,oro,oc;
     int m,r,c;
@@ -80,7 +96,10 @@ int main(int argc, char *argv[])
         
         memset(sendBuff, '0', sizeof(sendBuff)); 
         string temp;
-	cin>>m>>r>>c;
+	   b.set_move();
+       m=b.move[0];
+       r=b.move[1];/// y x ORDER !!!
+       c=b.move[2];
         
         snprintf(sendBuff, sizeof(sendBuff), "%d %d %d", m, r , c);
         write(sockfd, sendBuff, strlen(sendBuff));
@@ -109,6 +128,7 @@ int main(int argc, char *argv[])
         recvBuff[n] = 0;
         sscanf(recvBuff, "%d %d %d %d", &om,&oro,&oc,&d);
 	cout << om<<" "<<oro<<" "<<oc << " "<<d<<endl;
+        b.implement_move(om,oro,oc);
     	if(d==1)
 	{
 		cout<<"You win!! Yayee!! :D ";
@@ -121,7 +141,10 @@ int main(int argc, char *argv[])
 	}
         memset(sendBuff, '0', sizeof(sendBuff)); 
         string temp;
-	cin>>m>>r>>c;
+       b.set_move();
+       m=b.move[0];
+       r=b.move[1];/// y x ORDER !!!
+       c=b.move[2];
         snprintf(sendBuff, sizeof(sendBuff), "%d %d %d", m, r , c);
         write(sockfd, sendBuff, strlen(sendBuff));
 
