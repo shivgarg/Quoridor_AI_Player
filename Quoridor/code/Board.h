@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <queue>
 using namespace std;
 
 #define HORIZONTAL 1
@@ -62,8 +63,103 @@ public:
 		else
 			return true;
 	}
+
+	bool onboard(int x,int y)
+	{	
+		if(x>m || x<0 || y<0 || y>n )
+			return false;
+		else
+			return true;
+	}
+	
+	bool south(int x,int y)
+	{
+			if (walls[y+1][x]==1 || walls[y+1][x+1]==1)
+				return false;
+			else true;
+	}
+	bool north(int x,int y)
+	{
+		if (walls[y][x]==1 || walls[y][x+1]==1)
+				return false;
+			else true;
+	}
+	bool east(int x,int y)
+	{
+		if (walls[y][x+1]==1 || walls[y+1][x+1]==1)
+				return false;
+			else true;
+	}
+	bool west(int x,int y)
+	{
+		if (walls[y][x]==1 || walls[y+1][x]==1)
+				return false;
+			else true;
+	}
+		
+
 	// to add path blocking criteria 
 	//1 for horizontal 2 vice
+
+
+bool isNotPath(int x1,int y1,int tar)
+{
+			bool visited[n+1][m+1];
+			memset(visited,false,sizeof(bool)*(m+1)*(n+1));
+			visited[x1][y1]=true;
+			queue< pair<int,int> > bfs_q;
+			bfs_q.push(make_pair(x1,y1));
+			bool isblock=true;
+			while(!bfs_q.empty())
+			{
+				int x=bfs_q.front().first;
+				int y=bfs_q.front().second;
+				if(y==tar)
+				{
+					isblock=false;
+					break;
+				}
+				bfs_q.pop();
+				if(onboard(x+1,y) && !visited[x+1][y])
+				{
+					if(east(x,y))
+						{
+							bfs_q.push(make_pair(x+1,y));
+							visited[x+1][y]=true;
+						}
+				}
+				if(onboard(x-1,y) && !visited[x-1][y])
+				{
+					if(west(x,y))
+						{
+							bfs_q.push(make_pair(x-1,y));
+							visited[x-1][y]=true;
+						}
+				}
+				if(onboard(x,y+1) && !visited[x][y+1])
+				{
+					if(south(x,y))
+					{
+						bfs_q.push(make_pair(x,y+1));
+						visited[x][y+1]=true;
+
+					}
+				}
+				if(onboard(x,y-1) && !visited[x][y-1])
+				{
+					if(north(x,y))
+					{
+						bfs_q.push(make_pair(x,y-1));
+						visited[x][y-1]=true;
+					}
+				}
+
+			}
+			return isblock;
+}
+
+
+
 	bool legal_w(Position p,int type)
 	{
 			if(p.x<=1 || p.x>=m+1 || p.y<=1 || p.y>=n+1)
@@ -79,8 +175,23 @@ public:
 				else if(type==VERTICAL && (walls[p.y-1][p.x]==VERTICAL || walls[p.y+1][p.x]==VERTICAL))
 					return false;
 			}
-			return true;
+			walls[p.y][p.x]=type;
+			bool isblock=isNotPath(p1.p.x,p1.p.y,n);
+			if(isblock)
+			{	
+				walls[p.y][p.x]=0;
+				return false;
+			}
+			else
+			{
+				isblock=isNotPath(p2.p.x,p2.p.y,1);
+				walls[p.y][p.x]=0;
+				return isblock;
+			}
+
+		
 	}
+	
 			
 
 

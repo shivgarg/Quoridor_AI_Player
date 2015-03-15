@@ -2,7 +2,7 @@
 
 
 
-void implement_move(int type,int x,int y)
+void Board::implement_move(int type,int x,int y)
 {
 	if(type==0)
 	{
@@ -18,4 +18,9 @@ void implement_move(int type,int x,int y)
 void set_move()
 {
 	
+}
+
+int main()
+{
+
 }
