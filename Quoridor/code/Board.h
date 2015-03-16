@@ -11,6 +11,8 @@ using namespace std;
 #define HORIZONTAL 1
 #define VERTICAL 2
 #define INF 10000000
+#define DEPTH 4
+
 
 
 struct Position{
@@ -55,6 +57,7 @@ public:
 	int utility();
 	int f1();
 	int bfs(int,int,int);
+	void set_parents(int,int,int);
 
 	Board(int x,int y, int z)
 	{
@@ -127,6 +130,8 @@ bool isNotPath(int x1,int y1,int tar)
 			visited[x1][y1]=true;
 			queue< pair<int,int> > bfs_q;
 			bfs_q.push(make_pair(x1,y1));
+			if(y1==tar)
+				return false;
 			bool isblock=true;
 			while(!bfs_q.empty())
 			{

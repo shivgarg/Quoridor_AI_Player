@@ -1,7 +1,7 @@
 #include "Board.h"
 
-
-
+vector<Position> path_cells;
+vector<Move> curbestmoves;
 void Board::implement_move(Player *p,Move m)
 {
 	if(m.type==0)
@@ -20,30 +20,66 @@ int Board::maxval(int alpha,int beta,int depth)
 {
 	if(depth==0 || my->p.y==my_target)
 	{
-		cout<<"my->p.x="<<my->p.x<<" "<<"my->p.y="<<my->p.y<<" "<<"oppo->p.x="<<oppo->p.x<<" "<<"oppo->p.y="<<oppo->p.y<<" "<<"utility = "<<utility()<<endl;
+		// cout<<"my->p.x="<<my->p.x<<" "<<"my->p.y="<<my->p.y<<" "<<"oppo->p.x="<<oppo->p.x<<" "<<"oppo->p.y="<<oppo->p.y<<" "<<"utility = "<<utility()<<endl;
 		return utility();
 	}
 	else{
 		vector<Move> lis=get_move(my->p.x,my->p.y);
-		if(my->walls>0){
-			for(int i=2;i<=m;i++)
-				for(int j=2;j<=n;j++)
-				{
-					if(legal_w(Position(i,j),1))
-						lis.push_back(Move(Position(i,j),1));
-					if(legal_w(Position(i,j),2))
-						lis.push_back(Move(Position(i,j),2));
-				}
+
+		path_cells.clear();
+		if(my->walls > 0){
+			set_parents(oppo->p.x,oppo->p.y,oppo_target);
+			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
+
+			for (int i = 0; i < path_cells.size(); ++i)
+			{
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y),1))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),1));
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y),2))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),2));
+
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),1))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),1));
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),2))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),2));
+				
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),1))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),1));
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),2))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),2));
+				
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),1));
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
+			}
 		}
+
 		int l=lis.size();
-		cout << "size of lis "<< l << endl;
+
+		// cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=my->p;
 		int curbest=-10000;
 		int curbestind=-1;
+
 		for(int i=0;i<l;i++)
 		{
 			implement_move(my,lis[i]);
 			int tmp=minval(alpha,beta,depth-1);
+			if(lis[i].type==0 && depth==DEPTH){
+				// cout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp<<endl;
+			}
+			if(curbest==tmp && depth==DEPTH)
+				curbestmoves.push_back(lis[i]);
+			else if(curbest<tmp)
+			{	
+				curbest=tmp;
+				if(depth==DEPTH)
+					{
+						curbestmoves.clear();
+						curbestmoves.push_back(lis[i]);
+					}
+			}
 			curbest=max(curbest,tmp);
 			if(curbest==tmp)
 				curbestind=i;
@@ -55,17 +91,24 @@ int Board::maxval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			// if(alpha>=beta)
-			// {
-			// 	move[0]=lis[i].type;
-			// 	move[1]=lis[i].p.y;
-			// 	move[2]=lis[i].p.x;
-			// 	return tmp;
-			// }
+			if(alpha>=beta)
+			{
+				move[0]=lis[i].type;
+				move[1]=lis[i].p.y;
+				move[2]=lis[i].p.x;
+				return tmp;
+			}
 		}
-		move[0]=lis[curbestind].type;
-		move[1]=lis[curbestind].p.y;
-		move[2]=lis[curbestind].p.x;
+		if(depth==DEPTH)
+		{
+			// cout << "SIZE SIZE "<< curbestmoves.size()<< endl;
+			curbestind=rand()%(curbestmoves.size());
+
+			move[0]=curbestmoves[curbestind].type;
+			move[1]=curbestmoves[curbestind].p.y;
+			move[2]=curbestmoves[curbestind].p.x;	
+		}
+		
 		return curbest;
 	}
 
@@ -75,7 +118,7 @@ int Board::maxval(int alpha,int beta,int depth)
 
 int Board::bfs(int x1,int y1,int tar)
 {
-	// cout<<"In bfs : x1="<<x1<<" y1="<<y1<<" tar="<<tar<<endl;
+	//cout<<"In bfs : x1="<<x1<<" y1="<<y1<<" tar="<<tar<<endl;
 			int visited[m+1][n+1];
 			for(int i=0;i<m+1;i++)
 				for(int j=0;j<n+1;j++)
@@ -83,6 +126,8 @@ int Board::bfs(int x1,int y1,int tar)
 			visited[x1][y1]=0;
 			queue< pair<int,int> > bfs_q;
 			bfs_q.push(make_pair(x1,y1));
+			if(y1==tar)
+				return 0;
 			while(!bfs_q.empty())
 			{
 				int x=bfs_q.front().first;
@@ -145,13 +190,133 @@ int Board::bfs(int x1,int y1,int tar)
 }
 
 
+void Board::set_parents(int x1,int y1,int tar)
+{
+			// cout<<"In set_parents : x1="<<x1<<" y1="<<y1<<" tar="<<tar<<endl;
+			bool visited[m+1][n+1];
+			Position parents[m+1][n+1];
+			for(int i=0;i<m+1;i++)
+				for(int j=0;j<n+1;j++)
+					visited[i][j]=false;
+			visited[x1][y1]=true;
+			queue< pair<int,int> > bfs_q;
+			bfs_q.push(make_pair(x1,y1));
+			if(y1==tar)
+				return;
+			while(!bfs_q.empty())
+			{
+				int x=bfs_q.front().first;
+				int y=bfs_q.front().second;
+				
+				bfs_q.pop();
+				if(onboard(x+1,y) && visited[x+1][y]==false)
+				{
+
+					if(east(x,y))
+						{
+
+							bfs_q.push(make_pair(x+1,y));
+							visited[x+1][y]=true;
+							parents[x+1][y]=Position(x,y);
+
+							if(y==tar)
+							{
+								int i,j;
+								i=x+1;
+								j=y;
+								while(i!=x1 || j!=y1){
+									path_cells.push_back(Position(i,j));
+									Position tmp=parents[i][j];
+									i=tmp.x;
+									j=tmp.y;
+								}
+								return;
+							}
+
+						}
+				}
+				if(onboard(x-1,y) && visited[x-1][y]==false)
+				{
+					if(west(x,y))
+						{
+							bfs_q.push(make_pair(x-1,y));
+							visited[x-1][y]=true;
+							parents[x-1][y]=Position(x,y);
+							if(y==tar)
+							{
+								int i,j;
+								i=x-1;
+								j=y;
+								while(i!=x1 || j!=y1){
+									path_cells.push_back(Position(i,j));
+									Position tmp=parents[i][j];
+									i=tmp.x;
+									j=tmp.y;
+								}
+								return;
+							}
+						}
+				}
+				if(onboard(x,y+1) && visited[x][y+1]==false)
+				{
+					if(south(x,y))
+					{
+						bfs_q.push(make_pair(x,y+1));
+						visited[x][y+1]=true;
+						parents[x][y+1]=Position(x,y);
+						if(y+1==tar)
+						{
+
+							int i,j;
+							i=x;
+							j=y+1;
+							while(i!=x1 || j!=y1){								
+								path_cells.push_back(Position(i,j));
+								Position tmp=parents[i][j];
+								i=tmp.x;
+								j=tmp.y;
+
+							}
+							return;
+						}
+					}
+				}
+				if(onboard(x,y-1) && visited[x][y-1]==false)
+				{
+					if(north(x,y))
+					{
+						bfs_q.push(make_pair(x,y-1));
+						visited[x][y-1]=true;
+						parents[x][y-1]=Position(x,y);
+						if(y-1==tar)
+						{	
+							int i,j;
+							i=x;
+							j=y-1;
+							while(i!=x1 || j!=y1){
+								path_cells.push_back(Position(i,j));
+								Position tmp=parents[i][j];
+								i=tmp.x;
+								j=tmp.y;
+							}
+							return;
+						}
+					}
+				}
+
+			}
+		return;
+}
+
 
 int Board::f1()
 {	
-	// cout<<"MY TARGET = "<<my_target<<"   OPPO TARGET="<<oppo_target<<endl;
+	//cout<<"MY TARGET = "<<my_target<<"   OPPO TARGET="<<oppo_target<<endl;
 	int ret1 = bfs(my->p.x,my->p.y,my_target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo_target);
-	// cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
+	//cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
+	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
+	// return -2*ret1+my->walls;
 	return ret2-ret1;
 }
 
@@ -168,17 +333,37 @@ int Board::minval(int alpha,int beta,int depth)
 	}
 	else{
 		vector<Move> lis=get_move(oppo->p.x,oppo->p.y);
-		if(oppo->walls>0){
-			for(int i=2;i<=m;i++)
-				for(int j=2;j<=n;j++)
-				{
-					if(legal_w(Position(i,j),1))
-						lis.push_back(Move(Position(i,j),1));
-					if(legal_w(Position(i,j),2))
-						lis.push_back(Move(Position(i,j),2));
-				}
+		//set parent vector
+		path_cells.clear();
+		if(oppo->walls > 0){
+			set_parents(my->p.x,my->p.y,my_target);
+			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
+
+			for (int i = 0; i < path_cells.size(); ++i)
+			{
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y),1))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),1));
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y),2))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),2));
+
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),1))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),1));
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),2))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),2));
+				
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),1))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),1));
+				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),2))
+					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),2));
+				
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),1));
+				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2))
+					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
+			}
 		}
 		int l=lis.size();
+		// cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=oppo->p;
 		int curbest=10000;
 		for(int i=0;i<l;i++)
@@ -194,8 +379,8 @@ int Board::minval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			// if(alpha>=beta)
-			// 	return tmp;
+			if(alpha>=beta)
+				return tmp;
 		}
 		return curbest;
 	}
@@ -205,7 +390,7 @@ int Board::minval(int alpha,int beta,int depth)
 
 void Board::set_move()
 {
-	maxval(-100000000,100000000,2);
+	maxval(-100000000,100000000,DEPTH);
 	if(move[0]==0)
 	{
 		my->p.x=move[2];
@@ -402,10 +587,10 @@ vector<Move> Board::get_move(int x,int y)
 				}
 		}
 		int p=lis.size();
-		cout << "first "<< endl;
+		// cout << "first "<< endl;
 		for(int j=0;j<p;j++)
 		{
-			cout << lis[j].type<<" "<< lis[j].p.y<< " "<< lis[j].p.x<< endl;
+			// cout << lis[j].type<<" "<< lis[j].p.y<< " "<< lis[j].p.x<< endl;
 		}
 		return lis;
 }
