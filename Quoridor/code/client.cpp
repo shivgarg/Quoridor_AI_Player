@@ -128,7 +128,8 @@ int main(int argc, char *argv[])
         recvBuff[n] = 0;
         sscanf(recvBuff, "%d %d %d %d", &om,&oro,&oc,&d);
 	cout << om<<" "<<oro<<" "<<oc << " "<<d<<endl;
-        b.implement_move(om,oro,oc);
+        b.implement_move(b.oppo,Move(Position(oc,oro),om));
+
     	if(d==1)
 	{
 		cout<<"You win!! Yayee!! :D ";
@@ -141,6 +142,8 @@ int main(int argc, char *argv[])
 	}
         memset(sendBuff, '0', sizeof(sendBuff)); 
         string temp;
+        if(player==1)
+            cout << "player 1 chance "<< endl;
        b.set_move();
        m=b.move[0];
        r=b.move[1];/// y x ORDER !!!

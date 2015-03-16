@@ -3,7 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <algorithm>
 #include <queue>
+#include <iostream>
 using namespace std;
 
 #define HORIZONTAL 1
@@ -17,7 +19,12 @@ struct Position{
 	bool operator==( const Position & d ) const {  return (x==d.x) && (y==d.y);}
 };
 
-
+struct Move{
+	Position p;
+	int type;
+	Move(){};
+	Move(Position t,int t1): p(t),type(t1){};
+};
 
 struct Player{
 	Position p;
@@ -39,9 +46,12 @@ public:
 	int oppo_target;
 	int **walls;
 	int move[3];
-	void implement_move(int type,int x,int y);
-	vector<Position> get_move(int x,int y);
+	void implement_move(Player*,Move);
+	vector<Move> get_move(int x,int y);
 	void set_move();
+	int maxval(int,int,int);
+	int minval(int,int,int);
+	int utility();
 
 	Board(int x,int y, int z)
 	{
@@ -67,7 +77,7 @@ public:
 
 	bool onboard(int x,int y)
 	{	
-		if(x>m || x<0 || y<0 || y>n )
+		if(x>m || x<=0 || y<=0 || y>n )
 			return false;
 		else
 			return true;
