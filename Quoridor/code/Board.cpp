@@ -27,6 +27,7 @@ int Board::maxval(int alpha,int beta,int depth)
 		vector<Move> lis=get_move(my->p.x,my->p.y);
 
 		path_cells.clear();
+		if(((double) rand() / (RAND_MAX))<0.5 ||moves_cnt>15){
 		if(my->walls > 0){
 			set_parents(oppo->p.x,oppo->p.y,oppo_target);
 			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
@@ -54,7 +55,7 @@ int Board::maxval(int alpha,int beta,int depth)
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
 			}
 		}
-
+}
 		int l=lis.size();
 
 		// cout<<"MOVES SIZE="<<l<<endl;
@@ -311,7 +312,6 @@ void Board::set_parents(int x1,int y1,int tar)
 
 int Board::f1()
 {	
-	//cout<<"MY TARGET = "<<my_target<<"   OPPO TARGET="<<oppo_target<<endl;
 	int ret1 = bfs(my->p.x,my->p.y,my_target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo_target);
 	//cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
@@ -334,7 +334,9 @@ int Board::minval(int alpha,int beta,int depth)
 	else{
 		vector<Move> lis=get_move(oppo->p.x,oppo->p.y);
 		//set parent vector
+
 		path_cells.clear();
+		if(((double) rand() / (RAND_MAX))<0.1 || moves_cnt>20){
 		if(oppo->walls > 0){
 			set_parents(my->p.x,my->p.y,my_target);
 			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
@@ -361,7 +363,7 @@ int Board::minval(int alpha,int beta,int depth)
 				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2))
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
 			}
-		}
+		}}
 		int l=lis.size();
 		// cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=oppo->p;
@@ -390,6 +392,7 @@ int Board::minval(int alpha,int beta,int depth)
 
 void Board::set_move()
 {
+	moves_cnt++;
 	maxval(-100000000,100000000,DEPTH);
 	if(move[0]==0)
 	{

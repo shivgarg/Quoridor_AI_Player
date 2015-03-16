@@ -58,6 +58,7 @@ public:
 	int f1();
 	int bfs(int,int,int);
 	void set_parents(int,int,int);
+	int moves_cnt;
 
 	Board(int x,int y, int z)
 	{
@@ -70,7 +71,7 @@ public:
 			walls[i]=(int*)malloc((m+2)*sizeof(int));
 			memset(walls[i],0,sizeof(int)*(m+2));
 		}
-
+		moves_cnt=0;
 	}
 
 	bool legal_p(Position p)
