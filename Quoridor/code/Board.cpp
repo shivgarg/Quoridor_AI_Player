@@ -129,6 +129,7 @@ void Board::set_move()
 	else
 	{
 		walls[move[1]][move[2]]=move[0];
+		my->walls--;
 	}
 
 }
