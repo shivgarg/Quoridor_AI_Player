@@ -20,6 +20,7 @@ int Board::maxval(int alpha,int beta,int depth)
 {
 	if(depth==0 || my->p.y==my_target)
 	{
+		cout<<"my->p.x="<<my->p.x<<" "<<"my->p.y="<<my->p.y<<" "<<"oppo->p.x="<<oppo->p.x<<" "<<"oppo->p.y="<<oppo->p.y<<" "<<"utility = "<<utility()<<endl;
 		return utility();
 	}
 	else{
@@ -35,6 +36,7 @@ int Board::maxval(int alpha,int beta,int depth)
 				}
 		}
 		int l=lis.size();
+		cout << "size of lis "<< l << endl;
 		Position prev=my->p;
 		int curbest=-10000;
 		int curbestind=-1;
@@ -53,13 +55,13 @@ int Board::maxval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			if(alpha>=beta)
-			{
-				move[0]=lis[i].type;
-				move[1]=lis[i].p.y;
-				move[2]=lis[i].p.x;
-				return tmp;
-			}
+			// if(alpha>=beta)
+			// {
+			// 	move[0]=lis[i].type;
+			// 	move[1]=lis[i].p.y;
+			// 	move[2]=lis[i].p.x;
+			// 	return tmp;
+			// }
 		}
 		move[0]=lis[curbestind].type;
 		move[1]=lis[curbestind].p.y;
@@ -70,9 +72,92 @@ int Board::maxval(int alpha,int beta,int depth)
 }
 
 
+
+int Board::bfs(int x1,int y1,int tar)
+{
+	// cout<<"In bfs : x1="<<x1<<" y1="<<y1<<" tar="<<tar<<endl;
+			int visited[m+1][n+1];
+			for(int i=0;i<m+1;i++)
+				for(int j=0;j<n+1;j++)
+					visited[i][j]=INF;
+			visited[x1][y1]=0;
+			queue< pair<int,int> > bfs_q;
+			bfs_q.push(make_pair(x1,y1));
+			while(!bfs_q.empty())
+			{
+				int x=bfs_q.front().first;
+				int y=bfs_q.front().second;
+				
+				bfs_q.pop();
+				if(onboard(x+1,y) && visited[x+1][y]==INF)
+				{
+					if(east(x,y))
+						{
+							bfs_q.push(make_pair(x+1,y));
+							visited[x+1][y]=visited[x][y]+1;
+							if(y==tar)
+							{
+								return visited[x+1][y];
+							}
+
+						}
+				}
+				if(onboard(x-1,y) && visited[x-1][y]==INF)
+				{
+					if(west(x,y))
+						{
+							bfs_q.push(make_pair(x-1,y));
+							visited[x-1][y]=visited[x][y]+1;
+							if(y==tar)
+							{
+								return visited[x][y]+1;
+							}
+						}
+				}
+				if(onboard(x,y+1) && visited[x][y+1]==INF)
+				{
+					if(south(x,y))
+					{
+						bfs_q.push(make_pair(x,y+1));
+						visited[x][y+1]=visited[x][y]+1;
+						if(y+1==tar)
+						{
+							return visited[x][y]+1;
+						}
+
+					}
+				}
+				if(onboard(x,y-1) && visited[x][y-1]==INF)
+				{
+					if(north(x,y))
+					{
+						bfs_q.push(make_pair(x,y-1));
+						visited[x][y-1]=visited[x][y]+1;
+						if(y-1==tar)
+						{
+							return visited[x][y]+1;
+						}
+					}
+				}
+
+			}
+		return INF;
+}
+
+
+
+int Board::f1()
+{	
+	// cout<<"MY TARGET = "<<my_target<<"   OPPO TARGET="<<oppo_target<<endl;
+	int ret1 = bfs(my->p.x,my->p.y,my_target);
+	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo_target);
+	// cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
+	return ret2-ret1;
+}
+
 int Board::utility()
 {
-	return 1;
+	return f1();
 }
 
 int Board::minval(int alpha,int beta,int depth)
@@ -95,7 +180,7 @@ int Board::minval(int alpha,int beta,int depth)
 		}
 		int l=lis.size();
 		Position prev=oppo->p;
-		int curbest=-10000;
+		int curbest=10000;
 		for(int i=0;i<l;i++)
 		{
 			implement_move(oppo,lis[i]);
@@ -109,8 +194,8 @@ int Board::minval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			if(alpha>=beta)
-				return tmp;
+			// if(alpha>=beta)
+			// 	return tmp;
 		}
 		return curbest;
 	}
@@ -120,7 +205,7 @@ int Board::minval(int alpha,int beta,int depth)
 
 void Board::set_move()
 {
-	maxval(-100000000,100000000,1);
+	maxval(-100000000,100000000,2);
 	if(move[0]==0)
 	{
 		my->p.x=move[2];

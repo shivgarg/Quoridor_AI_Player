@@ -10,6 +10,7 @@ using namespace std;
 
 #define HORIZONTAL 1
 #define VERTICAL 2
+#define INF 10000000
 
 
 struct Position{
@@ -52,6 +53,8 @@ public:
 	int maxval(int,int,int);
 	int minval(int,int,int);
 	int utility();
+	int f1();
+	int bfs(int,int,int);
 
 	Board(int x,int y, int z)
 	{
@@ -195,30 +198,36 @@ bool isNotPath(int x1,int y1,int tar)
 	bool legal_w(Position p,int type)
 	{
 			if(p.x<=1 || p.x>=m+1 || p.y<=1 || p.y>=n+1)
+			{
+				//cout << "1"<< endl;
 				return false;
+			}
 			if(walls[p.y][p.x]!=0)
 			{
+				//	cout << "2"<< endl;
 					return false;
 			}
 			else
 			{
+				//cout <<"3"<< endl;
 				if(type==HORIZONTAL && (walls[p.y][p.x-1]==HORIZONTAL || walls[p.y][p.x+1]==HORIZONTAL))
 					return false;
 				else if(type==VERTICAL && (walls[p.y-1][p.x]==VERTICAL || walls[p.y+1][p.x]==VERTICAL))
 					return false;
 			}
 			walls[p.y][p.x]=type;
-			bool isblock=isNotPath(p1.p.x,p1.p.y,n);
+			bool isblock=isNotPath(oppo->p.x,oppo->p.y,oppo_target);
 			if(isblock)
 			{	
 				walls[p.y][p.x]=0;
+				//cout << "4"<< endl;
 				return false;
 			}
 			else
 			{
-				isblock=isNotPath(p2.p.x,p2.p.y,1);
+				isblock=isNotPath(my->p.x,my->p.y,my_target);
 				walls[p.y][p.x]=0;
-				return isblock;
+				return !isblock;
 			}
 
 		
