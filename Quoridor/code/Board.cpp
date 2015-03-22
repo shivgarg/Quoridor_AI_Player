@@ -24,6 +24,7 @@ int Board::maxval(int alpha,int beta,int depth)
 		//cout << "return here "<< endl;
 		//if(depth!=0)
 		//	cout << "yay"<< endl;
+		cout << "IN MAXVAL IF CASE "<<utility() <<endl;
 		return utility();
 	}
 	else{
@@ -67,12 +68,14 @@ int Board::maxval(int alpha,int beta,int depth)
 		Position prev=my->p;
 		int curbest=-10000;
 		int curbestind=-1;
-
+		cout << "IN MAXVAL ELSE CASE"<< endl;
 		for(int i=0;i<l;i++)
 		{
 			implement_move(my,lis[i]);
+			cout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			int tmp=minval(alpha,beta,depth-1);
-
+			cout << "COST OF MOVE "<< tmp << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			cout << endl;
 			if(lis[i].type==0 && depth==DEPTH){
 				 cout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp<<endl;
 			}
@@ -98,7 +101,7 @@ int Board::maxval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 			{
 				move[0]=lis[i].type;
 				move[1]=lis[i].p.y;
@@ -320,7 +323,7 @@ int Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my_target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo_target);
-	//cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
+	cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
 	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
 	// return -2*ret1+my->walls;
 	return 2*ret2-ret1;
@@ -338,11 +341,15 @@ int Board::minval(int alpha,int beta,int depth)
 		//cout << "should not return here "<< depth<<endl;
 		// if(depth!=0)
 		// 	cout << "yay"<< endl;
+		cout << "IN MINVAL IF CASE "<< utility()<<endl;
 		return utility();
 	}
 	else{
-		vector<Move> lis=get_move(oppo->p.x,oppo->p.y);
+		vector<Move> lis;
+		if(oppo_target!=oppo->p.y)
+			lis=get_move(oppo->p.x,oppo->p.y);
 		//set parent vector
+		cout << "IN MINVAL ELSE CASE"<< endl;
 
 		path_cells.clear();
 		// if(((double) rand() / (RAND_MAX))<0.5 || moves_cnt>15){
@@ -380,7 +387,10 @@ int Board::minval(int alpha,int beta,int depth)
 		for(int i=0;i<l;i++)
 		{
 			implement_move(oppo,lis[i]);
+			cout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			int tmp=maxval(alpha,beta,depth-1);
+			cout << "COST OF MOVE "<< tmp <<" in "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			cout << endl;
 			curbest=min(curbest,tmp);
 			beta=min(beta,tmp);
 			if(lis[i].type==0)
@@ -390,7 +400,7 @@ int Board::minval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 				return tmp;
 		}
 		return curbest;
