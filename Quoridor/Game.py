@@ -352,6 +352,11 @@ class Game:
         other_players = self.other_players
         cur_pt = player.position
         other_pts = [p.position for p in other_players]
+	for p in other_players:
+		for x in p.goal_positions:
+			if p.position == x:
+				print "here"
+				other_pts.remove(x)
         avail_pts_temp = self.graph.get_adj_nodes(cur_pt)
         for s in avail_pts_temp:
             if s in other_pts:
