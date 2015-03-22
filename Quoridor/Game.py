@@ -293,8 +293,8 @@ class Game:
         return self.graph.findPathDepthFirst(player.position, player.goal_positions, player.sortfunc) is not None
 
     def update_all(self, player_list=None):
-        for p in player_list:
-            self.update_shortest_path(p)
+        #for p in player_list:
+        #    self.update_shortest_path(p)
         self.update_legal_moves()
         self.update_legal_walls()
     

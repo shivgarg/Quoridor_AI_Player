@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
        m=b.move[0];
        r=b.move[1];/// y x ORDER !!!
        c=b.move[2];
-        
+               cout << "move sent "<< m << " "<< r <<" "<<c << endl;
         snprintf(sendBuff, sizeof(sendBuff), "%d %d %d", m, r , c);
         write(sockfd, sendBuff, strlen(sendBuff));
 
@@ -128,19 +128,20 @@ int main(int argc, char *argv[])
         recvBuff[n] = 0;
         sscanf(recvBuff, "%d %d %d %d", &om,&oro,&oc,&d);
 	cout << om<<" "<<oro<<" "<<oc << " "<<d<<endl;
-        b.implement_move(b.oppo,Move(Position(oc,oro),om));
+        if(oc!=0 || oro!=0)
+            b.implement_move(b.oppo,Move(Position(oc,oro),om));
 
     	if(d==1)
-	{
-		cout<<"You win!! Yayee!! :D ";
-		break;
-	}
-	else if(d==2)
-	{
-		cout<<"Loser :P ";
-		break;
-	}
-        memset(sendBuff, '0', sizeof(sendBuff)); 
+    	{
+    		cout<<"You win!! Yayee!! :D ";
+    		break;
+    	}
+    	else if(d==2)
+    	{
+    		cout<<"Loser :P ";
+    		break;
+    	}
+            memset(sendBuff, '0', sizeof(sendBuff)); 
         string temp;
         if(player==1)
             cout << "player 1 chance "<< endl;
@@ -148,6 +149,7 @@ int main(int argc, char *argv[])
        m=b.move[0];
        r=b.move[1];/// y x ORDER !!!
        c=b.move[2];
+       cout << "move sent "<< m << " "<< r <<" "<<c << endl;
         snprintf(sendBuff, sizeof(sendBuff), "%d %d %d", m, r , c);
         write(sockfd, sendBuff, strlen(sendBuff));
 
