@@ -13,7 +13,7 @@ using namespace std;
 #define HORIZONTAL 1
 #define VERTICAL 2
 #define INF 10000000
-#define DEPTH 4
+#define DEPTH 5
 
 
 struct Position{

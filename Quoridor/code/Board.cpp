@@ -79,7 +79,10 @@ int Board::maxval(int alpha,int beta,int depth)
 			implement_move(my,lis[i]);
 			fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			int tmp=minval(alpha,beta,depth-1);
-			if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 && oppo->target==oppo->p.y){
+			fout << "in max !!!!!! "<< tmp << endl;
+			fout << lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 ){
+				fout << "inc tmp"<<endl;
 				tmp++;
 			}
 			fout << "COST OF MOVE "<< tmp << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
