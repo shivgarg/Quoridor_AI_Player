@@ -14,7 +14,6 @@ using namespace std;
 #define DEPTH 4
 
 
-
 struct Position{
 	int x,y;
 	Position(){};

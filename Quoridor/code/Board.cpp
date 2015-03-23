@@ -25,7 +25,7 @@ int Board::maxval(int alpha,int beta,int depth)
 		//if(depth!=0)
 		//	cout << "yay"<< endl;
 		cout << "IN MAXVAL IF CASE "<<utility() <<endl;
-		return utility();
+		return utility()+depth;
 	}
 	else{
 		vector<Move> lis;
@@ -101,7 +101,7 @@ int Board::maxval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			if(alpha>beta)
+			if(alpha>=beta)
 			{
 				move[0]=lis[i].type;
 				move[1]=lis[i].p.y;
@@ -112,8 +112,8 @@ int Board::maxval(int alpha,int beta,int depth)
 		if(depth==DEPTH)
 		{
 			// cout << "SIZE SIZE "<< curbestmoves.size()<< endl;
-			curbestind=rand()%(curbestmoves.size());
-			//curbestind=0;
+			//curbestind=rand()%(curbestmoves.size());
+			curbestind=0;
 			move[0]=curbestmoves[curbestind].type;
 			move[1]=curbestmoves[curbestind].p.y;
 			move[2]=curbestmoves[curbestind].p.x;	
@@ -323,10 +323,10 @@ int Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my_target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo_target);
-	cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<endl;
+	cout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<"     (my->walls)/(moves_cnt+1) = "<< (my->walls)/(moves_cnt+1) <<endl;
 	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
 	// return -2*ret1+my->walls;
-	return 2*ret2-ret1;
+	return 2*ret2-ret1+(my->walls)/(moves_cnt+1);
 }
 
 int Board::utility()
@@ -342,7 +342,7 @@ int Board::minval(int alpha,int beta,int depth)
 		// if(depth!=0)
 		// 	cout << "yay"<< endl;
 		cout << "IN MINVAL IF CASE "<< utility()<<endl;
-		return utility();
+		return utility()-depth;
 	}
 	else{
 		vector<Move> lis;
@@ -400,7 +400,7 @@ int Board::minval(int alpha,int beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			if(alpha>beta)
+			if(alpha>=beta)
 				return tmp;
 		}
 		return curbest;
@@ -521,50 +521,6 @@ vector<Move> Board::get_move(int x,int y)
 						lis.push_back(Move(Position(x-1,y),0));
 				}
 		}
-		if(onboard(x,y+1))
-		{
-			if(south(x,y))
-				{
-					if(oppo->p.x==x && oppo->p.y==y+1)
-					{
-						if(onboard(x,y+2))
-						{
-							if(south(x,y+1))
-							{
-								lis.push_back(Move(Position(x,y+2),0));
-							}
-							else
-							{
-								if(onboard(x-1,y+1))
-								{
-									if(west(x,y+1))
-										lis.push_back(Move(Position(x-1,y+1),0));
-								}
-								if(onboard(x+1,y+1))
-								{
-									if(east(x,y+1))
-										lis.push_back(Move(Position(x+1,y+1),0));
-								}
-							}
-						}
-						else
-						{
-							if(onboard(x-1,y+1))
-								{
-									if(west(x,y+1))
-										lis.push_back(Move(Position(x-1,y+1),0));
-								}
-								if(onboard(x+1,y+1))
-								{
-									if(east(x,y+1))
-										lis.push_back(Move(Position(x+1,y+1),0));
-								}
-						}
-					}
-					else
-						lis.push_back(Move(Position(x,y+1),0));
-				}
-		}
 		if(onboard(x,y-1))
 		{
 			if(north(x,y))
@@ -607,6 +563,50 @@ vector<Move> Board::get_move(int x,int y)
 					}
 					else
 						lis.push_back(Move(Position(x,y-1),0));
+				}
+		}
+		if(onboard(x,y+1))
+		{
+			if(south(x,y))
+				{
+					if(oppo->p.x==x && oppo->p.y==y+1)
+					{
+						if(onboard(x,y+2))
+						{
+							if(south(x,y+1))
+							{
+								lis.push_back(Move(Position(x,y+2),0));
+							}
+							else
+							{
+								if(onboard(x-1,y+1))
+								{
+									if(west(x,y+1))
+										lis.push_back(Move(Position(x-1,y+1),0));
+								}
+								if(onboard(x+1,y+1))
+								{
+									if(east(x,y+1))
+										lis.push_back(Move(Position(x+1,y+1),0));
+								}
+							}
+						}
+						else
+						{
+							if(onboard(x-1,y+1))
+								{
+									if(west(x,y+1))
+										lis.push_back(Move(Position(x-1,y+1),0));
+								}
+								if(onboard(x+1,y+1))
+								{
+									if(east(x,y+1))
+										lis.push_back(Move(Position(x+1,y+1),0));
+								}
+						}
+					}
+					else
+						lis.push_back(Move(Position(x,y+1),0));
 				}
 		}
 		int p=lis.size();

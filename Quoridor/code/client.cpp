@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
         memset(sendBuff, '0', sizeof(sendBuff)); 
         string temp;
 	   b.set_move();
+       exit(0);
        m=b.move[0];
        r=b.move[1];/// y x ORDER !!!
        c=b.move[2];
