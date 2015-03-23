@@ -13,7 +13,7 @@ using namespace std;
 #define HORIZONTAL 1
 #define VERTICAL 2
 #define INF 10000000
-#define DEPTH 3
+#define DEPTH 4
 
 
 struct Position{
@@ -52,10 +52,10 @@ public:
 	void implement_move(Player*,Move);
 	vector<Move> get_move(int x,int y,Player*);
 	void set_move();
-	int maxval(int,int,int);
-	int minval(int,int,int);
-	int utility();
-	int f1();
+	pair<double,int> maxval(double,double,int);
+	pair<double,int> minval(double,double,int);
+	pair<double,int> utility();
+	pair<double,int> f1();
 	int bfs(int,int,int);
 	void set_parents(int,int,int);
 	int moves_cnt;

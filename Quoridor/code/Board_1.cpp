@@ -1,9 +1,9 @@
-#include "Board.h"
+#include "Board_1.h"
 
 FILE *p;
 ofstream fout;
 vector<Position> path_cells;
-vector<Move> curbestmoves;
+vector< pair<int,Move> > curbestmoves;
 void Board::implement_move(Player *p,Move m)
 {
 	if(m.p.x==0 || m.p.y==0){}
@@ -19,7 +19,12 @@ void Board::implement_move(Player *p,Move m)
 	}
 }
 
-int Board::maxval(int alpha,int beta,int depth)
+bool compare(pair<int,Move> a,pair<int,Move> b )
+{
+	return a.first<b.first;
+}
+
+pair<double,int> Board::maxval(double alpha,double beta,int depth)
 {
 	if(depth==0)
 	{
@@ -27,7 +32,7 @@ int Board::maxval(int alpha,int beta,int depth)
 		//cout << "return here "<< endl;
 		//if(depth!=0)
 		//	cout << "yay"<< endl;
-		fout << "IN MAXVAL IF CASE "<<utility() <<endl;
+		fout << "IN MAXVAL IF CASE "<<utility().first <<endl;
 		return utility();
 	}
 	else{
@@ -71,40 +76,40 @@ int Board::maxval(int alpha,int beta,int depth)
 		}
 		cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=my->p;
-		int curbest=-10000;
+		pair<double,int> curbest=make_pair(-10000.0,-1);
 		int curbestind=-1;
 		fout << "IN MAXVAL ELSE CASE"<< endl;
 		for(int i=0;i<l;i++)
 		{
 			implement_move(my,lis[i]);
 			fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
-			int tmp=minval(alpha,beta,depth-1);
-				fout << "in max !!!!!! "<< tmp << endl;
+			pair<double,int> tmp=minval(alpha,beta,depth-1);
+				fout << "in max !!!!!! "<< tmp.first << endl;
 			fout << lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 ){
 				fout << "inc tmp"<<endl;
-				tmp++;
+				tmp.first++;
 			}
-			fout << "COST OF MOVE "<< tmp << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << "COST OF MOVE "<< tmp.first << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			fout << endl;
 			if(lis[i].type==0 && depth==DEPTH){
-				 fout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp<<endl;
+				 fout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp.first<<endl;
 			}
-			if(curbest==tmp && depth==DEPTH)
-				curbestmoves.push_back(lis[i]);
-			else if(curbest<tmp)
+			if(curbest.first==tmp.first && depth==DEPTH)
+				curbestmoves.push_back(make_pair(tmp.second,lis[i]));
+			else if(curbest.first<tmp.first)
 			{	
 				curbest=tmp;
 				if(depth==DEPTH)
 					{
 						curbestmoves.clear();
-						curbestmoves.push_back(lis[i]);
+						curbestmoves.push_back(make_pair(tmp.second,lis[i]));
 					}
 			}
-			curbest=max(curbest,tmp);
-			if(curbest==tmp)
-				curbestind=i;
-			alpha=max(alpha,tmp);
+			// curbest=max(curbest,tmp.first);
+			// if(curbest==tmp.first)
+			// 	curbestind=i;
+			alpha=max(alpha,tmp.first);
 			if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0){}
 			else if(lis[i].type==0 )
 				implement_move(my,Move(prev,0));
@@ -126,9 +131,10 @@ int Board::maxval(int alpha,int beta,int depth)
 			// cout << "SIZE SIZE "<< curbestmoves.size()<< endl;
 			//curbestind=rand()%(curbestmoves.size());
 			curbestind=0;
-			move[0]=curbestmoves[curbestind].type;
-			move[1]=curbestmoves[curbestind].p.y;
-			move[2]=curbestmoves[curbestind].p.x;	
+			sort(curbestmoves.begin(),curbestmoves.end(),compare);
+			move[0]=curbestmoves[curbestind].second.type;
+			move[1]=curbestmoves[curbestind].second.p.y;
+			move[2]=curbestmoves[curbestind].second.p.x;	
 		}
 		
 		return curbest;
@@ -331,29 +337,29 @@ void Board::set_parents(int x1,int y1,int tar)
 }
 
 
-int Board::f1()
+pair<double,int> Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my->target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
 	fout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<"     (my->walls)/(moves_cnt+1) = "<< (my->walls)/(moves_cnt+1) <<endl;
 	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
 	// return -2*ret1+my->walls;
-	return ret2-ret1;
+	return make_pair(ret2*ret2-ret1*ret1,ret1);
 }
 
-int Board::utility()
+pair<double,int> Board::utility()
 {
 	return f1();
 }
 
-int Board::minval(int alpha,int beta,int depth)
+pair<double,int> Board::minval(double alpha,double beta,int depth)
 {
 	if(depth==0 )
 	{
 		//cout << "should not return here "<< depth<<endl;
 		// if(depth!=0)
 		// 	cout << "yay"<< endl;
-		fout << "IN MINVAL IF CASE "<< utility()<<endl;
+		fout << "IN MINVAL IF CASE "<< utility().first<<endl;
 		return utility();
 	}
 	else{
@@ -398,19 +404,20 @@ int Board::minval(int alpha,int beta,int depth)
 		}
 		// cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=oppo->p;
-		int curbest=10000;
+		pair<double,int> curbest=make_pair(10000,-1);
 		for(int i=0;i<l;i++)
 		{
 			implement_move(oppo,lis[i]);
 			fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
-			int tmp=maxval(alpha,beta,depth-1);
+			pair<double,int> tmp=maxval(alpha,beta,depth-1);
 			// if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 && my->target==my->p.y){
 			// 	tmp--;
 			// }
-			fout << "COST OF MOVE "<< tmp <<" in "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << "COST OF MOVE "<< tmp.first <<" in "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			fout << endl;
-			curbest=min(curbest,tmp);
-			beta=min(beta,tmp);
+			if(curbest.first>tmp.first)
+				curbest=tmp;
+			beta=min(beta,tmp.first);
 			if(lis[i].p.x==0 && lis[i].p.y==0){}
 			else if(lis[i].type==0 )
 				implement_move(oppo,Move(prev,0));
