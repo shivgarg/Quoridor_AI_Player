@@ -73,16 +73,16 @@ int main(int argc, char *argv[])
     if(player==1)
     {
         b.my=&b.p1;
-        b.my_target=N;
+        b.my->target=N;
         b.oppo=&b.p2;
-        b.oppo_target=1;
+        b.oppo->target=1;
     }
     else
     {
         b.my=&b.p2;
-        b.my_target=1;
+        b.my->target=1;
         b.oppo=&b.p1;
-        b.oppo_target=N;
+        b.oppo->target=N;
 
     }
     float TL;

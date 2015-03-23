@@ -33,6 +33,7 @@ struct Move{
 struct Player{
 	Position p;
 	int walls;
+	int target;
 	Player(){};
 	Player(Position o,int w)
 	{
@@ -46,12 +47,10 @@ public:
 	int n,m,k;
 	Player p1,p2;
 	Player* my,*oppo;
-	int my_target;
-	int oppo_target;
 	int **walls;
 	int move[3];
 	void implement_move(Player*,Move);
-	vector<Move> get_move(int x,int y);
+	vector<Move> get_move(int x,int y,Player*);
 	void set_move();
 	int maxval(int,int,int);
 	int minval(int,int,int);
@@ -223,7 +222,7 @@ bool isNotPath(int x1,int y1,int tar)
 					return false;
 			}
 			walls[p.y][p.x]=type;
-			bool isblock=isNotPath(oppo->p.x,oppo->p.y,oppo_target);
+			bool isblock=isNotPath(oppo->p.x,oppo->p.y,oppo->target);
 			if(isblock)
 			{	
 				walls[p.y][p.x]=0;
@@ -232,7 +231,7 @@ bool isNotPath(int x1,int y1,int tar)
 			}
 			else
 			{
-				isblock=isNotPath(my->p.x,my->p.y,my_target);
+				isblock=isNotPath(my->p.x,my->p.y,my->target);
 				walls[p.y][p.x]=0;
 				return !isblock;
 			}
