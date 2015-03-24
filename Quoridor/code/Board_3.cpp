@@ -1,9 +1,13 @@
-#include "Board_1.h"
+
+
+#include "Board_3.h"
 
 FILE *p;
 ofstream fout;
 vector<Position> path_cells;
 vector< pair<int,Move> > curbestmoves;
+
+
 void Board::implement_move(Player *p,Move m)
 {
 	if(m.p.x==0 || m.p.y==0){}
@@ -32,11 +36,14 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 		//cout << "return here "<< endl;
 		//if(depth!=0)
 		//	cout << "yay"<< endl;
-		//fout << "IN MAXVAL IF CASE "<<utility().first <<endl;
+		fout << "IN MAXVAL IF CASE "<<utility().first <<endl;
 		return utility();
 	}
 	else{
 		vector<Move> lis;
+		bool wall_considered[311];
+		memset(wall_considered,false,sizeof(bool)*311);
+
 		if(my->p.y!=my->target)
 			lis=get_move(my->p.x,my->p.y,oppo);
 
@@ -48,25 +55,47 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 
 			for (int i = 0; i < path_cells.size(); ++i)
 			{
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y),1))
+				if(!wall_considered[100+path_cells[i].x*10+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),1)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),1));
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y),2))
+					wall_considered[100+path_cells[i].x*10+path_cells[i].y]=true;
+				}
+				if(!wall_considered[200+path_cells[i].x*10+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),2)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),2));
+					wall_considered[200+path_cells[i].x*10+path_cells[i].y]=true;
+				}
 
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),1))
+
+
+				if(!wall_considered[100+(path_cells[i].x+1)*10+path_cells[i].y] && legal_w(Position(path_cells[i].x+1,path_cells[i].y),1)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),1));
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),2))
+					wall_considered[100+(path_cells[i].x+1)*10+path_cells[i].y]=true;
+				}
+				if(!wall_considered[200+(path_cells[i].x+1)*10+path_cells[i].y] && legal_w(Position(path_cells[i].x+1,path_cells[i].y),2)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),2));
+					wall_considered[200+(path_cells[i].x+1)*10+path_cells[i].y]=true;
+				}
+
+
 				
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),1))
+				if(!wall_considered[100+path_cells[i].x*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x,path_cells[i].y+1),1)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),1));
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),2))
+					wall_considered[100+path_cells[i].x*10+(path_cells[i].y+1)]=true;
+				}
+
+				if(!wall_considered[200+path_cells[i].x*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x,path_cells[i].y+1),2)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),2));
+					wall_considered[200+path_cells[i].x*10+(path_cells[i].y+1)]=true;
+				}
 				
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1))
+
+				if(!wall_considered[100+(path_cells[i].x+1)*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),1));
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2))
+					wall_considered[100+(path_cells[i].x+1)*10+(path_cells[i].y+1)]=true;
+				}
+				if(!wall_considered[200+(path_cells[i].x+1)*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
+					wall_considered[200+(path_cells[i].x+1)*10+(path_cells[i].y+1)]=true;
+				}
 			}
 		}
 
@@ -74,26 +103,26 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 		if(l==0){
 			lis.push_back(Move(Position(0,0),0));l++;
 		}
-		//cout<<"MOVES SIZE="<<l<<endl;
+		cout<<"MOVES SIZE="<<l<<endl;
 		Position prev=my->p;
 		pair<double,int> curbest=make_pair(-10000.0,-1);
 		int curbestind=-1;
-		//fout << "IN MAXVAL ELSE CASE"<< endl;
+		fout << "IN MAXVAL ELSE CASE"<< endl;
 		for(int i=0;i<l;i++)
 		{
 			implement_move(my,lis[i]);
-			//fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			pair<double,int> tmp=minval(alpha,beta,depth-1);
-				//fout << "in max !!!!!! "<< tmp.first << endl;
-			//fout << lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+				fout << "in max !!!!!! "<< tmp.first << endl;
+			fout << lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 ){
-				//fout << "inc tmp"<<endl;
+				fout << "inc tmp"<<endl;
 				tmp.first++;
 			}
-			//fout << "COST OF MOVE "<< tmp.first << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
-			//fout << endl;
+			fout << "COST OF MOVE "<< tmp.first << " in "<<  lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << endl;
 			if(lis[i].type==0 && depth==DEPTH){
-				 //fout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp.first<<endl;
+				 fout<<"\t"<<lis[i].p.y<<" "<<lis[i].p.x<<" "<<tmp.first<<endl;
 			}
 			if(curbest.first==tmp.first && depth==DEPTH)
 				curbestmoves.push_back(make_pair(tmp.second,lis[i]));
@@ -130,8 +159,12 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 		{
 			// cout << "SIZE SIZE "<< curbestmoves.size()<< endl;
 			//curbestind=rand()%(curbestmoves.size());
-			curbestind=0;
 			sort(curbestmoves.begin(),curbestmoves.end(),compare);
+			int count=1;
+			int best_d=curbestmoves[0].first;
+			while(count<curbestmoves.size() && curbestmoves[count].first==best_d)
+				count++;
+			curbestind=rand()%count;
 			move[0]=curbestmoves[curbestind].second.type;
 			move[1]=curbestmoves[curbestind].second.p.y;
 			move[2]=curbestmoves[curbestind].second.p.x;	
@@ -341,10 +374,10 @@ pair<double,int> Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my->target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	//fout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<"     (my->walls)/(moves_cnt+1) = "<< (my->walls)/(moves_cnt+1) <<endl;
+	fout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<"     (my->walls)/(moves_cnt+1) = "<< (my->walls)/(moves_cnt+1) <<endl;
 	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
 	// return -2*ret1+my->walls;
-	return make_pair(ret2-ret1,ret1);
+	return make_pair((2*ret2*ret2-3*ret1*ret1+my->walls-oppo->walls),ret1);
 }
 
 pair<double,int> Board::utility()
@@ -356,18 +389,21 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 {
 	if(depth==0 )
 	{
-		//cout << "should not return here "<< depth<<endl;
+		////cout << "should not return here "<< depth<<endl;
 		// if(depth!=0)
-		// 	cout << "yay"<< endl;
-		//fout << "IN MINVAL IF CASE "<< utility().first<<endl;
+		// 	//cout << "yay"<< endl;
+		fout << "IN MINVAL IF CASE "<< utility().first<<endl;
 		return utility();
 	}
 	else{
 		vector<Move> lis;
+		bool wall_considered[311];
+		memset(wall_considered,false,sizeof(bool)*311);
+
 		if(oppo->target!=oppo->p.y)
 			lis=get_move(oppo->p.x,oppo->p.y,my);
 		//set parent vector
-		//fout << "IN MINVAL ELSE CASE"<< endl;
+		fout << "IN MINVAL ELSE CASE"<< endl;
 
 		path_cells.clear();
 		// if(((double) rand() / (RAND_MAX))<0.5 || moves_cnt>15){
@@ -377,25 +413,47 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 
 			for (int i = 0; i < path_cells.size(); ++i)
 			{
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y),1))
+				if(!wall_considered[100+path_cells[i].x*10+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),1)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),1));
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y),2))
+					wall_considered[100+path_cells[i].x*10+path_cells[i].y]=true;
+				}
+				if(!wall_considered[200+path_cells[i].x*10+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),2)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y),2));
+					wall_considered[200+path_cells[i].x*10+path_cells[i].y]=true;
+				}
 
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),1))
+
+
+				if(!wall_considered[100+(path_cells[i].x+1)*10+path_cells[i].y] && legal_w(Position(path_cells[i].x+1,path_cells[i].y),1)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),1));
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y),2))
+					wall_considered[100+(path_cells[i].x+1)*10+path_cells[i].y]=true;
+				}
+				if(!wall_considered[200+(path_cells[i].x+1)*10+path_cells[i].y] && legal_w(Position(path_cells[i].x+1,path_cells[i].y),2)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y),2));
+					wall_considered[200+(path_cells[i].x+1)*10+path_cells[i].y]=true;
+				}
+
+
 				
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),1))
+				if(!wall_considered[100+path_cells[i].x*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x,path_cells[i].y+1),1)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),1));
-				if(legal_w(Position(path_cells[i].x,path_cells[i].y+1),2))
+					wall_considered[100+path_cells[i].x*10+(path_cells[i].y+1)]=true;
+				}
+
+				if(!wall_considered[200+path_cells[i].x*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x,path_cells[i].y+1),2)){
 					lis.push_back(Move(Position(path_cells[i].x,path_cells[i].y+1),2));
+					wall_considered[200+path_cells[i].x*10+(path_cells[i].y+1)]=true;
+				}
 				
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1))
+
+				if(!wall_considered[100+(path_cells[i].x+1)*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),1)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),1));
-				if(legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2))
+					wall_considered[100+(path_cells[i].x+1)*10+(path_cells[i].y+1)]=true;
+				}
+				if(!wall_considered[200+(path_cells[i].x+1)*10+(path_cells[i].y+1)] && legal_w(Position(path_cells[i].x+1,path_cells[i].y+1),2)){
 					lis.push_back(Move(Position(path_cells[i].x+1,path_cells[i].y+1),2));
+					wall_considered[200+(path_cells[i].x+1)*10+(path_cells[i].y+1)]=true;
+				}
 			}
 		}
 		int l=lis.size();
@@ -408,13 +466,13 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 		for(int i=0;i<l;i++)
 		{
 			implement_move(oppo,lis[i]);
-			//fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << "Move under consideration "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
 			pair<double,int> tmp=maxval(alpha,beta,depth-1);
 			// if(lis[i].p.x==0 && lis[i].p.y==0 && lis[i].type==0 && my->target==my->p.y){
 			// 	tmp--;
 			// }
-			//fout << "COST OF MOVE "<< tmp.first <<" in "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
-			//fout << endl;
+			fout << "COST OF MOVE "<< tmp.first <<" in "<< lis[i].type << " y "<<lis[i].p.y<< " x "<< lis[i].p.x<< endl;
+			fout << endl;
 			if(curbest.first>tmp.first)
 				curbest=tmp;
 			beta=min(beta,tmp.first);
@@ -444,11 +502,11 @@ void Board::set_move()
 	else
 		ss<<"1/"<<moves_cnt;
 	//p=fopen(ss.str().c_str(),'w');
-	//fout.open(ss.str().c_str());
+	fout.open(ss.str().c_str());
 	curbestmoves.clear();
 	maxval(-100000000,100000000,DEPTH);
 	//fclose(p);
-	//fout.close();
+	fout.close();
 	if(move[0]==0)
 	{
 		my->p.x=move[2];
