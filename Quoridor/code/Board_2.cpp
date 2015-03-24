@@ -375,7 +375,7 @@ pair<double,int> Board::f1()
 	fout<<"RET1 = "<<ret1<<"   RET2 = "<<ret2<<"     (my->walls)/(moves_cnt+1) = "<< (my->walls)/(moves_cnt+1) <<endl;
 	// return 10/(ret2+1)-5/(ret1+1)+(my->walls-oppo->walls);
 	// return -2*ret1+my->walls;
-	return make_pair((2*ret2*ret2-ret1*ret1+2*my->walls-oppo->walls),ret1);
+	return make_pair((2*ret2*ret2-3*ret1*ret1+my->walls-oppo->walls-(20.0*my->walls)/((double)(ret2+1)*(ret2+1))+(100)/((double)(ret1+1)*(ret1+1))),ret1);
 }
 
 pair<double,int> Board::utility()
