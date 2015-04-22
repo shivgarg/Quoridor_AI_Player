@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <arpa/inet.h> 
 #include <bits/stdc++.h>
-#include "Board.h"
+#include "Board_1.h"
 
 using namespace std;
 /* Complete the function below to print 1 integer which will be your next move 
@@ -70,12 +70,14 @@ int main(int argc, char *argv[])
     cout<<"Time "<<time_left<<endl;
     cout<<"Board size "<<N<<"x"<<M<<" :"<<K<<endl;
     Board b(N,M,K);
+    // cout<<"q_tail="<<b.q_tail<<" q_head="<<b.q_head<<endl;
     if(player==1)
     {
         b.my=&b.p1;
         b.my->target=N;
         b.oppo=&b.p2;
         b.oppo->target=1;
+        b.my->walls--;
     }
     else
     {
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
         b.my->target=1;
         b.oppo=&b.p1;
         b.oppo->target=N;
-
+        b.my->walls--;
     }
     float TL;
     int om,oro,oc;

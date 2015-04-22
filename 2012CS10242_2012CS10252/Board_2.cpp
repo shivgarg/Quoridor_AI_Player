@@ -1,4 +1,4 @@
-#include "Board_1.h"
+#include "Board_2.h"
 #include <math.h>
 
 FILE *p;
@@ -378,8 +378,10 @@ pair<double,int> Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my->target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	cout<<"HEURISTIC:"<<pow(2,((double)ret2))-pow(2.5,((double)ret1))<<endl;
-	return make_pair(1.1*ret2*ret2-ret1*ret1,ret1);
+	if(ret2==0)
+		return(make_pair(-50.0,ret1));
+	// cout<<"HEURISTICS"<<pow(2,((double)ret2)/(100.0))<<" "<<pow(2,((double)ret1)/100.0)<<" "<<pow(1.8,((double)my->walls)/(100))<<endl;
+	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.9,((double)my->walls)/(100)),ret1);
 }
 
 pair<double,int> Board::utility()

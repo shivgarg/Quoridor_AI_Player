@@ -56,13 +56,9 @@ public:
 	pair<double,int> minval(double,double,int);
 	pair<double,int> utility();
 	pair<double,int> f1();
-	int histcount(int x,int y);
 	int bfs(int,int,int);
 	void set_parents(int,int,int);
 	int moves_cnt;
-	Position history_queue[10];
-	int q_head;
-	int q_tail;
 
 	Board(int x,int y, int z)
 	{
@@ -75,8 +71,6 @@ public:
 			walls[i]=(int*)malloc((m+2)*sizeof(int));
 			memset(walls[i],0,sizeof(int)*(m+2));
 		}
-		q_head=0;
-		q_tail=0;
 		moves_cnt=0;
 	}
 
