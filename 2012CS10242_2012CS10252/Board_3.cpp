@@ -1,4 +1,4 @@
-#include "Board_2.h"
+#include "Board_3.h"
 #include <math.h>
 
 FILE *p;
@@ -84,9 +84,15 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 		path_cells.clear();
 		// if(((double) rand() / (RAND_MAX))<0.5 ||moves_cnt>15){
 		if(my->walls > 0){
-			set_parents(oppo->p.x,oppo->p.y,oppo->target);
+			//set_parents(oppo->p.x,oppo->p.y,oppo->target);
 			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
-
+			for(int i=1;i<=n;i++)
+			{
+				for(int j=1;j<n;j++)
+				{
+					path_cells.push_back(Position(i,j));
+				}
+			}
 			for (int i = 0; i < path_cells.size(); ++i)
 			{
 				if(!wall_considered_h[path_cells[i].x*(n+1)+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),1)){
@@ -185,7 +191,7 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 			{
 				return tmp;
 			}
@@ -489,9 +495,15 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 		path_cells.clear();
 		// if(((double) rand() / (RAND_MAX))<0.5 || moves_cnt>15){
 		if(oppo->walls > 0){
-			set_parents(my->p.x,my->p.y,my->target);
+			//set_parents(my->p.x,my->p.y,my->target);
 			// cout<<"PATH_CELLS SIZE="<<path_cells.size()<<endl;
-
+			for(int i=1;i<=n;i++)
+			{
+				for(int j=1;j<n;j++)
+				{
+					path_cells.push_back(Position(i,j));
+				}
+			}
 			for (int i = 0; i < path_cells.size(); ++i)
 			{
 				if(!wall_considered_h[path_cells[i].x*(n+1)+path_cells[i].y] && legal_w(Position(path_cells[i].x,path_cells[i].y),1)){
@@ -565,7 +577,7 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 				return tmp;
 		}
 		return curbest;
@@ -587,19 +599,10 @@ void Board::set_move()
 	curbestmoves.clear();
 	// cout<<"q_tail="<<q_tail<<" q_head="<<q_head<<endl;
 	if(toggle_depth)
-		DEPTH=2;
+		DEPTH=6;
 	else
-		DEPTH=2;
+		DEPTH=6;
 	toggle_depth=!toggle_depth;
-
-	int this_dist = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	if(this_dist<=3 && !released && my->walls==0){
-		my->walls++;
-		released=true;
-	}
-
-
-
 	maxval(-100000000,100000000,DEPTH);
 	//fclose(p);
 	//fout.close();

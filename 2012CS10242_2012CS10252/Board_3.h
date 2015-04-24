@@ -63,7 +63,7 @@ public:
 	Position history_queue[10];
 	int q_head;
 	int q_tail;
-	bool toggle_depth,released;
+	bool toggle_depth;
 	Board(int x,int y, int z)
 	{
 		n=x;m=y;k=z;
@@ -76,7 +76,6 @@ public:
 			memset(walls[i],0,sizeof(int)*(m+2));
 		}
 		q_head=0;
-		released=false;
 		q_tail=0;
 		moves_cnt=0;
 		toggle_depth=false;
