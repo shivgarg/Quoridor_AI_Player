@@ -179,8 +179,8 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 			int best_d=curbestmoves[0].first;
 			while(count<curbestmoves.size() && curbestmoves[count].first==best_d)
 				count++;
-			// curbestind=rand()%count;
-			curbestind = 0;
+			curbestind=rand()%count;
+			//curbestind = 0;
 			if(curbestmoves[curbestind].second.type == 0 && curbestmoves[curbestind].second.p.x!=0 && histcount(curbestmoves[curbestind].second.p.x,curbestmoves[curbestind].second.p.y)>=3)
 			{
 				cout<<"TOGGLE!!!\n";
@@ -437,7 +437,7 @@ pair<double,int> Board::f1()
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
 	if(ret2<=1 && my->walls>0)
 		return make_pair(-50-ret1,ret1); 
-	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+(1.0/((double)ret2+1.0))*pow(1.8,((double)my->walls)/(10)),ret1);
+	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.8,((double)my->walls)/(50)),ret1);
 }
 
 pair<double,int> Board::utility()
@@ -566,7 +566,11 @@ void Board::set_move()
 	//fout.open(ss.str().c_str());
 	curbestmoves.clear();
 	// cout<<"q_tail="<<q_tail<<" q_head="<<q_head<<endl;
-
+	if(toggle_depth)
+		DEPTH=3;
+	else
+		DEPTH=5;
+	toggle_depth=!toggle_depth;
 	maxval(-100000000,100000000,DEPTH);
 	//fclose(p);
 	//fout.close();

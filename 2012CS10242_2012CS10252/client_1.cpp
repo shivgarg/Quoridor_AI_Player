@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         b.my->target=N;
         b.oppo=&b.p2;
         b.oppo->target=1;
-        // b.my->walls--;
+        b.my->walls--;
         
     }
     else
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
         b.my->target=1;
         b.oppo=&b.p1;
         b.oppo->target=N;
-        // b.my->walls--;
+        b.my->walls--;
     }
     float TL;
     int om,oro,oc;

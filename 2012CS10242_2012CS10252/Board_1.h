@@ -13,7 +13,6 @@ using namespace std;
 #define HORIZONTAL 1
 #define VERTICAL 2
 #define INF 10000000
-#define DEPTH 4
 
 
 struct Position{
@@ -46,6 +45,7 @@ class Board{
 public:
 	int n,m,k;
 	Player p1,p2;
+	int DEPTH;
 	Player* my,*oppo;
 	int **walls;
 	int move[3];
@@ -63,7 +63,7 @@ public:
 	Position history_queue[10];
 	int q_head;
 	int q_tail;
-
+	bool toggle_depth;
 	Board(int x,int y, int z)
 	{
 		n=x;m=y;k=z;
@@ -78,6 +78,7 @@ public:
 		q_head=0;
 		q_tail=0;
 		moves_cnt=0;
+		toggle_depth=false;
 	}
 
 	bool legal_p(Position p)

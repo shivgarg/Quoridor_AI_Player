@@ -27,6 +27,20 @@ bool compare(pair<int,Move> a,pair<int,Move> b )
 	return a.first<b.first;
 }
 
+int Board::histcount(int x,int y)
+{
+
+	int t=q_head;
+	int count=0;
+	while(t!=q_tail)
+	{
+		if(history_queue[t].x==x && history_queue[t].y==y)
+			count++;
+		t=(t+1)%10;
+	}
+	return count;
+}
+
 pair<double,int> Board::maxval(double alpha,double beta,int depth)
 {
 	if(depth==0)
@@ -47,6 +61,26 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 		if(my->p.y!=my->target)
 			lis=get_move(my->p.x,my->p.y,oppo);
 
+		Move best_move;
+		int best_dist=1000000;
+		for (int i = 0; i < lis.size(); ++i)
+		{
+			Position prev=my->p;
+			implement_move(my,lis[i]);	
+			int this_dist = bfs(my->p.x,my->p.y,my->target);
+			implement_move(my,Move(prev,0));	
+			if(this_dist < best_dist)
+			{
+				best_move = lis[i];
+				best_dist = this_dist;
+			}
+		}
+
+		if(lis.size()>0)
+		{
+			lis.clear();
+			lis.push_back(best_move);
+		}
 		path_cells.clear();
 		// if(((double) rand() / (RAND_MAX))<0.5 ||moves_cnt>15){
 		if(my->walls > 0){
@@ -153,9 +187,6 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 			}
 			if(alpha>beta)
 			{
-				move[0]=lis[i].type;
-				move[1]=lis[i].p.y;
-				move[2]=lis[i].p.x;
 				return tmp;
 			}
 		}
@@ -169,9 +200,55 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 			while(count<curbestmoves.size() && curbestmoves[count].first==best_d)
 				count++;
 			curbestind=rand()%count;
-			move[0]=curbestmoves[curbestind].second.type;
-			move[1]=curbestmoves[curbestind].second.p.y;
-			move[2]=curbestmoves[curbestind].second.p.x;	
+			//curbestind = 0;
+			if(curbestmoves[curbestind].second.type == 0 && curbestmoves[curbestind].second.p.x!=0 && histcount(curbestmoves[curbestind].second.p.x,curbestmoves[curbestind].second.p.y)>=3)
+			{
+				cout<<"TOGGLE!!!\n";
+				cout<<"TOGGLE!!!\n";
+				cout<<"TOGGLE!!!\n";
+				vector<Move> lis = get_move(my->p.x,my->p.y,oppo);
+				int best_dist = 100000;
+				int best_idx = -1;
+				for (int i = 0; i < lis.size(); ++i)
+				{
+					int this_dist = bfs(lis[i].p.x,lis[i].p.y,my->target);
+					if(this_dist < best_dist)
+					{
+						this_dist = best_dist;
+						best_idx = i;
+					}
+				}
+				move[0]=0;
+				move[1]=lis[best_idx].p.y;
+				move[2]=lis[best_idx].p.x;
+				if((q_tail+1)%10==q_head)
+				{
+					q_head=(q_head+1)%10;
+				}
+				history_queue[q_tail].y=move[1];
+				history_queue[q_tail].x=move[2];
+				q_tail=(q_tail+1)%10;
+
+			}
+			else
+			{
+				move[0]=curbestmoves[curbestind].second.type;
+				move[1]=curbestmoves[curbestind].second.p.y;
+				move[2]=curbestmoves[curbestind].second.p.x;
+				if(curbestmoves[curbestind].second.type==0)
+				{
+					cout<<"q_tail="<<q_tail<<" q_head="<<q_head<<endl;
+					if((q_tail+1)%10==q_head)
+					{
+						q_head=(q_head+1)%10;
+					}
+					history_queue[q_tail].y=move[1];
+					history_queue[q_tail].x=move[2];
+					q_tail=(q_tail+1)%10;
+
+				}
+			}
+
 		}
 		
 		return curbest;
@@ -378,10 +455,9 @@ pair<double,int> Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my->target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	if(ret2==0)
-		return(make_pair(-50.0,ret1));
-	// cout<<"HEURISTICS"<<pow(2,((double)ret2)/(100.0))<<" "<<pow(2,((double)ret1)/100.0)<<" "<<pow(1.8,((double)my->walls)/(100))<<endl;
-	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.9,((double)my->walls)/(100)),ret1);
+	if(ret2<=1 && my->walls>0)
+		return make_pair(-50-ret1,ret1);
+	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.8,((double)my->walls)/(50)),ret1);
 }
 
 pair<double,int> Board::utility()
@@ -509,6 +585,12 @@ void Board::set_move()
 	//p=fopen(ss.str().c_str(),'w');
 	//fout.open(ss.str().c_str());
 	curbestmoves.clear();
+	// cout<<"q_tail="<<q_tail<<" q_head="<<q_head<<endl;
+	if(toggle_depth)
+		DEPTH=4;
+	else
+		DEPTH=5;
+	toggle_depth=!toggle_depth;
 	maxval(-100000000,100000000,DEPTH);
 	//fclose(p);
 	//fout.close();

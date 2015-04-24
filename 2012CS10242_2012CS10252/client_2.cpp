@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <arpa/inet.h> 
 #include <bits/stdc++.h>
-#include "Board_1.h"
+#include "Board_2.h"
 
 using namespace std;
 /* Complete the function below to print 1 integer which will be your next move 
