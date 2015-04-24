@@ -185,7 +185,7 @@ pair<double,int> Board::maxval(double alpha,double beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				my->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 			{
 				return tmp;
 			}
@@ -455,9 +455,10 @@ pair<double,int> Board::f1()
 {	
 	int ret1 = bfs(my->p.x,my->p.y,my->target);
 	int ret2 = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	if(ret2<=1 && my->walls>0)
+	if(ret2<=2 && my->walls>0)
 		return make_pair(-50-ret1,ret1);
-	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.8,((double)my->walls)/(50)),ret1);
+	return make_pair(pow(2,((double)ret2)/(100.0))-pow(2,((double)ret1)/100.0)+pow(1.8,((double)my->walls)/(50.0)),ret1);
+	// return make_pair(ret2*ret2-ret1*ret1,ret1);
 }
 
 pair<double,int> Board::utility()
@@ -565,7 +566,7 @@ pair<double,int> Board::minval(double alpha,double beta,int depth)
 				walls[lis[i].p.y][lis[i].p.x]=0;
 				oppo->walls++;
 			}
-			if(alpha>=beta)
+			if(alpha>beta)
 				return tmp;
 		}
 		return curbest;
@@ -586,16 +587,34 @@ void Board::set_move()
 	//fout.open(ss.str().c_str());
 	curbestmoves.clear();
 	// cout<<"q_tail="<<q_tail<<" q_head="<<q_head<<endl;
-	if(toggle_depth)
-		DEPTH=2;
-	else
-		DEPTH=2;
-	toggle_depth=!toggle_depth;
 
 	int this_dist = bfs(oppo->p.x,oppo->p.y,oppo->target);
-	if(this_dist<=3 && !released && my->walls==0){
-		my->walls++;
-		released=true;
+	if(n==9)
+	{
+		DEPTH=5;
+		if(this_dist<=3 && !released && my->walls==0){
+			my->walls++;
+			released=true;
+		}
+	}
+	else if(n==11)
+	{
+		DEPTH=4;
+		if(this_dist<=4 && !released && my->walls==0){
+			my->walls++;
+			my->walls++;
+			released=true;
+		}
+
+	}
+	else if(n==13)
+	{
+		DEPTH=4;
+		if(this_dist<=5 && !released && my->walls==0){
+			my->walls++;
+			my->walls++;
+			released=true;
+		}
 	}
 
 

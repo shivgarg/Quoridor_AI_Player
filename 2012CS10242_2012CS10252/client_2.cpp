@@ -77,8 +77,9 @@ int main(int argc, char *argv[])
         b.my->target=N;
         b.oppo=&b.p2;
         b.oppo->target=1;
-         b.my->walls--;
-        
+        b.my->walls--;
+        if(b.n==11 || b.n==13)
+            b.my->walls--;        
     }
     else
     {
@@ -87,6 +88,8 @@ int main(int argc, char *argv[])
         b.oppo=&b.p1;
         b.oppo->target=N;
         b.my->walls--;
+        if(b.n==11 || b.n==13)
+            b.my->walls--;
     }
     float TL;
     int om,oro,oc;
