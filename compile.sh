@@ -1,1 +1,1 @@
-g++ Board_1.cpp client.cpp -O1 -O2 -O3 -Ofast -o bot
+g++ Board.cpp client.cpp -O1 -O2 -O3 -Ofast -o bot
